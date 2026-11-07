@@ -1,0 +1,63 @@
+/* ==========================================================================
+   Estilos globales — Tailwind CSS v4
+   ========================================================================== */
+@import "tailwindcss";
+
+/* Modo oscuro controlado por la clase .dark en <html> (no por el sistema),
+   para que el interruptor del sidebar decida el tema. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Color primario de la marca. Cambiando estas líneas (p. ej. a blue o
+     indigo) se recolorea toda la interfaz: estados activos, hover, botones. */
+  --color-primary-50: var(--color-violet-50);
+  --color-primary-100: var(--color-violet-100);
+  --color-primary-200: var(--color-violet-200);
+  --color-primary-300: var(--color-violet-300);
+  --color-primary-400: var(--color-violet-400);
+  --color-primary-500: var(--color-violet-500);
+  --color-primary-600: var(--color-violet-600);
+  --color-primary-700: var(--color-violet-700);
+  --color-primary-800: var(--color-violet-800);
+  --color-primary-900: var(--color-violet-900);
+
+  /* Curva de animación "suave": arranca rápido y frena con delicadeza.
+     Uso: clase `ease-suave` (p. ej. en el hover de las tarjetas). */
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Entrada de cada vista (Principal, Categorías…): aparece y sube 8 px.
+     Uso: clase `animate-aparecer`. */
+  --animate-aparecer: aparecer 0.4s var(--ease-suave) both;
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+
+/* Fondo de la página: gris suave (#F1F5F9) en modo claro para descansar la
+   vista; las tarjetas y el sidebar son blancos y resaltan sobre él. */
+body {
+  @apply bg-slate-100 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200;
+}
+
+/* Cambio de tema suave: lib/useTema.js agrega esta clase a <html> durante
+   el cambio, para que TODOS los elementos (no sólo el fondo) se desvanezcan
+   de un color a otro en lugar de saltar de golpe. */
+.tema-transicion,
+.tema-transicion *,
+.tema-transicion *::before,
+.tema-transicion *::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, translate, transform !important;
+  transition-duration: 450ms !important;
+  transition-timing-function: ease-in-out !important;
+}
+
+/* Respeta a quienes desactivan las animaciones en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

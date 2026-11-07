@@ -1,0 +1,207 @@
+[
+  {
+    "id": 1,
+    "titulo": "Sistema mecatrónico embebido para clasificación automática de piezas por color y tamaño",
+    "resumen": "Diseño e implementación de una celda de clasificación basada en un microcontrolador ESP32 y una cámara OV2640. El sistema identifica piezas por color y dimensiones mediante procesamiento de imágenes en el borde y acciona servomotores para desviarlas a su contenedor, alcanzando una precisión del 96 % a 30 piezas por minuto.",
+    "tipo": "TEG",
+    "anio": 2026,
+    "fecha": "2026-10-15",
+    "empresa": null,
+    "autores": [
+      "María Fernanda Rojas",
+      "Luis Alberto Méndez"
+    ],
+    "tutores": [
+      "Carlos Pérez"
+    ],
+    "etiquetas": [
+      "Control y Automatización"
+    ],
+    "palabras_clave": [
+      "visión artificial",
+      "esp32",
+      "banda transportadora"
+    ],
+    "nombre_archivo": "TEG_2026_Rojas.pdf",
+    "tamano_bytes": 1967
+  },
+  {
+    "id": 2,
+    "titulo": "Red de sensores LoRaWAN para el monitoreo de la calidad del agua en el río Caroní",
+    "resumen": "Se desplegaron cinco nodos autónomos alimentados por energía solar que miden pH, turbidez, temperatura y oxígeno disuelto. Los datos viajan por LoRaWAN hasta un gateway y se visualizan en un tablero web con alertas en tiempo real cuando se superan los límites de la norma venezolana.",
+    "tipo": "TEG",
+    "anio": 2026,
+    "fecha": "2026-09-28",
+    "empresa": null,
+    "autores": [
+      "José Gregorio Salazar"
+    ],
+    "tutores": [
+      "Ana Martínez"
+    ],
+    "etiquetas": [
+      "Telecomunicaciones"
+    ],
+    "palabras_clave": [
+      "lorawan",
+      "iot",
+      "ph",
+      "turbidez"
+    ],
+    "nombre_archivo": "TEG_2026_Salazar.pdf",
+    "tamano_bytes": 1880
+  },
+  {
+    "id": 3,
+    "titulo": "Optimización del sistema de excitación de un generador síncrono en una planta hidroeléctrica",
+    "resumen": "Informe de entrenamiento industrial que documenta la sintonización del regulador automático de voltaje de una unidad generadora. Se modeló el lazo de excitación en MATLAB/Simulink y se propusieron nuevos parámetros PID que reducen el sobreimpulso del voltaje en terminales de 12 % a 4 %.",
+    "tipo": "IEI",
+    "anio": 2026,
+    "fecha": "2026-09-10",
+    "empresa": "CORPOELEC",
+    "autores": [
+      "Daniela Carolina Ruiz"
+    ],
+    "tutores": [
+      "Ramón Figueroa"
+    ],
+    "etiquetas": [
+      "Electrónica de Potencia"
+    ],
+    "palabras_clave": [
+      "avr",
+      "generador síncrono",
+      "pid"
+    ],
+    "nombre_archivo": "IEI_2026_Ruiz.pdf",
+    "tamano_bytes": 1962
+  },
+  {
+    "id": 4,
+    "titulo": "Prótesis mioeléctrica de mano de bajo costo con control por redes neuronales",
+    "resumen": "Se desarrolló una prótesis impresa en 3D que interpreta señales electromiográficas superficiales del antebrazo. Un modelo de red neuronal cuantizado, ejecutado en un microcontrolador ARM Cortex-M4, reconoce seis gestos con una exactitud del 91 % y una latencia menor a 150 ms.",
+    "tipo": "TEG",
+    "anio": 2025,
+    "fecha": "2025-12-02",
+    "empresa": null,
+    "autores": [
+      "Andrea Valentina Gómez",
+      "Pedro José Hernández"
+    ],
+    "tutores": [
+      "Miguel Ángel Torres"
+    ],
+    "etiquetas": [
+      "Procesamiento de Señales"
+    ],
+    "palabras_clave": [
+      "emg",
+      "impresión 3d",
+      "tinyml"
+    ],
+    "nombre_archivo": "TEG_2025_Gomez.pdf",
+    "tamano_bytes": 1897
+  },
+  {
+    "id": 5,
+    "titulo": "Diseño de un inversor fotovoltaico monofásico con seguimiento del punto de máxima potencia",
+    "resumen": "Implementación de un inversor de 1 kW con algoritmo MPPT de perturbación y observación sobre un DSP TMS320F28379D. El prototipo entrega una onda senoidal con distorsión armónica total inferior al 3 % y una eficiencia pico del 94 %.",
+    "tipo": "TEG",
+    "anio": 2025,
+    "fecha": "2025-11-20",
+    "empresa": null,
+    "autores": [
+      "Ricardo Antonio Marcano"
+    ],
+    "tutores": [
+      "Laura Contreras"
+    ],
+    "etiquetas": [
+      "Energías Renovables"
+    ],
+    "palabras_clave": [
+      "mppt",
+      "inversor",
+      "spwm",
+      "paneles solares"
+    ],
+    "nombre_archivo": "TEG_2025_Marcano.pdf",
+    "tamano_bytes": 1817
+  },
+  {
+    "id": 6,
+    "titulo": "Automatización del sistema de dosificación de aditivos en la línea de colada de SIDOR",
+    "resumen": "Durante el entrenamiento industrial se migró la lógica de dosificación de relés a un PLC Siemens S7-1500 y se diseñaron las pantallas HMI en WinCC. La automatización redujo la variabilidad de la dosificación y el tiempo de parada por ajustes manuales.",
+    "tipo": "IEI",
+    "anio": 2025,
+    "fecha": "2025-10-05",
+    "empresa": "SIDOR",
+    "autores": [
+      "Gabriela Alejandra León"
+    ],
+    "tutores": [
+      "Héctor Villarroel"
+    ],
+    "etiquetas": [
+      "Control y Automatización"
+    ],
+    "palabras_clave": [
+      "plc",
+      "scada",
+      "siemens s7-1500"
+    ],
+    "nombre_archivo": "IEI_2025_Leon.pdf",
+    "tamano_bytes": 1885
+  },
+  {
+    "id": 7,
+    "titulo": "Plataforma FPGA para la enseñanza de sistemas digitales en el laboratorio de Electrónica",
+    "resumen": "Se diseñó una tarjeta de desarrollo con FPGA Lattice iCE40 y una guía de diez prácticas de laboratorio en VHDL. La herramienta usa software de código abierto y reduce el costo por puesto de trabajo frente a las tarjetas comerciales.",
+    "tipo": "TEG",
+    "anio": 2025,
+    "fecha": "2025-07-18",
+    "empresa": null,
+    "autores": [
+      "Jesús Manuel Blanco"
+    ],
+    "tutores": [
+      "Patricia Lugo"
+    ],
+    "etiquetas": [
+      "Sistemas Digitales y Embebidos"
+    ],
+    "palabras_clave": [
+      "fpga",
+      "vhdl",
+      "docencia"
+    ],
+    "nombre_archivo": "TEG_2025_Blanco.pdf",
+    "tamano_bytes": 1793
+  },
+  {
+    "id": 8,
+    "titulo": "Enlace de radio definido por software para comunicaciones rurales en el estado Bolívar",
+    "resumen": "Implementación de un enlace punto a punto de 12 km basado en radio definida por software con modulación OFDM en GNU Radio. Se evaluó el desempeño frente al multitrayecto característico de la zona y se propone como alternativa de bajo costo para comunidades sin cobertura.",
+    "tipo": "TEG",
+    "anio": 2024,
+    "fecha": "2024-11-30",
+    "empresa": null,
+    "autores": [
+      "Rafael Enrique Castillo",
+      "Mariana Isabel Díaz"
+    ],
+    "tutores": [
+      "Fernando Ríos"
+    ],
+    "etiquetas": [
+      "Telecomunicaciones"
+    ],
+    "palabras_clave": [
+      "sdr",
+      "gnu radio",
+      "ofdm"
+    ],
+    "nombre_archivo": "TEG_2024_Castillo.pdf",
+    "tamano_bytes": 1891
+  }
+]

@@ -1,0 +1,46 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1243 >>
+stream
+BT /F1 10 Tf 150.5 790.0 Td (UNIVERSIDAD NACIONAL EXPERIMENTAL POLITÉCNICA) Tj ET
+BT /F1 10 Tf 134.0 775.5 Td ("ANTONIO JOSÉ DE SUCRE" - VICERRECTORADO PUERTO ORDAZ) Tj ET
+BT /F1 10 Tf 174.3 761.0 Td (DEPARTAMENTO DE INGENIERÍA ELECTRÓNICA) Tj ET
+BT /F1 12 Tf 202.7 706.5 Td (TRABAJO ESPECIAL DE GRADO) Tj ET
+BT /F1 15 Tf 83.0 679.1 Td (DISEÑO DE UN INVERSOR FOTOVOLTAICO MONOFÁSICO) Tj ET
+BT /F1 15 Tf 91.1 658.9 Td (CON SEGUIMIENTO DEL PUNTO DE MÁXIMA POTENCIA) Tj ET
+BT /F1 11 Tf 60.0 608.6 Td (Autor\(es\): Ricardo Antonio Marcano) Tj ET
+BT /F1 11 Tf 60.0 592.6 Td (Tutor: Laura Contreras) Tj ET
+BT /F1 11 Tf 60.0 576.7 Td (Fecha de aprobación: 20/11/2025) Tj ET
+BT /F1 12 Tf 60.0 540.7 Td (RESUMEN) Tj ET
+BT /F1 11 Tf 60.0 523.3 Td (Implementación de un inversor de 1 kW con algoritmo MPPT de perturbación y observación) Tj ET
+BT /F1 11 Tf 60.0 507.4 Td (sobre un DSP TMS320F28379D. El prototipo entrega una onda senoidal con distorsión) Tj ET
+BT /F1 11 Tf 60.0 491.4 Td (armónica total inferior al 3 % y una eficiencia pico del 94 %.) Tj ET
+BT /F1 11 Tf 60.0 467.5 Td (Palabras clave: MPPT, inversor, SPWM, paneles solares) Tj ET
+BT /F1 8 Tf 156.4 70.0 Td (Documento de prueba generado automáticamente para el Repositorio Digital.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000338 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1633
+%%EOF

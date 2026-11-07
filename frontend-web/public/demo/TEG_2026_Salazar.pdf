@@ -1,0 +1,47 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1306 >>
+stream
+BT /F1 10 Tf 150.5 790.0 Td (UNIVERSIDAD NACIONAL EXPERIMENTAL POLITÉCNICA) Tj ET
+BT /F1 10 Tf 134.0 775.5 Td ("ANTONIO JOSÉ DE SUCRE" - VICERRECTORADO PUERTO ORDAZ) Tj ET
+BT /F1 10 Tf 174.3 761.0 Td (DEPARTAMENTO DE INGENIERÍA ELECTRÓNICA) Tj ET
+BT /F1 12 Tf 202.7 706.5 Td (TRABAJO ESPECIAL DE GRADO) Tj ET
+BT /F1 15 Tf 81.8 679.1 Td (RED DE SENSORES LORAWAN PARA EL MONITOREO DE LA) Tj ET
+BT /F1 15 Tf 147.2 658.9 Td (CALIDAD DEL AGUA EN EL RÍO CARONÍ) Tj ET
+BT /F1 11 Tf 60.0 608.6 Td (Autor\(es\): José Gregorio Salazar) Tj ET
+BT /F1 11 Tf 60.0 592.6 Td (Tutor: Ana Martínez) Tj ET
+BT /F1 11 Tf 60.0 576.7 Td (Fecha de aprobación: 28/09/2026) Tj ET
+BT /F1 12 Tf 60.0 540.7 Td (RESUMEN) Tj ET
+BT /F1 11 Tf 60.0 523.3 Td (Se desplegaron cinco nodos autónomos alimentados por energía solar que miden pH,) Tj ET
+BT /F1 11 Tf 60.0 507.4 Td (turbidez, temperatura y oxígeno disuelto. Los datos viajan por LoRaWAN hasta un gateway) Tj ET
+BT /F1 11 Tf 60.0 491.4 Td (y se visualizan en un tablero web con alertas en tiempo real cuando se superan los) Tj ET
+BT /F1 11 Tf 60.0 475.5 Td (límites de la norma venezolana.) Tj ET
+BT /F1 11 Tf 60.0 451.5 Td (Palabras clave: LoRaWAN, IoT, pH, turbidez) Tj ET
+BT /F1 8 Tf 156.4 70.0 Td (Documento de prueba generado automáticamente para el Repositorio Digital.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000338 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1696
+%%EOF

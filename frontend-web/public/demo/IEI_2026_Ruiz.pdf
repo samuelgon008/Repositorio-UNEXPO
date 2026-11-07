@@ -1,0 +1,48 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1388 >>
+stream
+BT /F1 10 Tf 150.5 790.0 Td (UNIVERSIDAD NACIONAL EXPERIMENTAL POLITÉCNICA) Tj ET
+BT /F1 10 Tf 134.0 775.5 Td ("ANTONIO JOSÉ DE SUCRE" - VICERRECTORADO PUERTO ORDAZ) Tj ET
+BT /F1 10 Tf 174.3 761.0 Td (DEPARTAMENTO DE INGENIERÍA ELECTRÓNICA) Tj ET
+BT /F1 12 Tf 161.9 706.5 Td (INFORME DE ENTRENAMIENTO INDUSTRIAL) Tj ET
+BT /F1 15 Tf 91.1 679.1 Td (OPTIMIZACIÓN DEL SISTEMA DE EXCITACIÓN DE UN) Tj ET
+BT /F1 15 Tf 72.8 658.9 Td (GENERADOR SÍNCRONO EN UNA PLANTA HIDROELÉCTRICA) Tj ET
+BT /F1 11 Tf 60.0 608.6 Td (Autor\(es\): Daniela Carolina Ruiz) Tj ET
+BT /F1 11 Tf 60.0 592.6 Td (Tutor: Ramón Figueroa) Tj ET
+BT /F1 11 Tf 60.0 576.7 Td (Empresa: CORPOELEC) Tj ET
+BT /F1 11 Tf 60.0 560.7 Td (Fecha de aprobación: 10/09/2026) Tj ET
+BT /F1 12 Tf 60.0 524.8 Td (RESUMEN) Tj ET
+BT /F1 11 Tf 60.0 507.4 Td (Informe de entrenamiento industrial que documenta la sintonización del regulador) Tj ET
+BT /F1 11 Tf 60.0 491.4 Td (automático de voltaje de una unidad generadora. Se modeló el lazo de excitación en) Tj ET
+BT /F1 11 Tf 60.0 475.5 Td (MATLAB/Simulink y se propusieron nuevos parámetros PID que reducen el sobreimpulso del) Tj ET
+BT /F1 11 Tf 60.0 459.5 Td (voltaje en terminales de 12 % a 4 %.) Tj ET
+BT /F1 11 Tf 60.0 435.6 Td (Palabras clave: AVR, generador síncrono, PID) Tj ET
+BT /F1 8 Tf 156.4 70.0 Td (Documento de prueba generado automáticamente para el Repositorio Digital.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000338 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1778
+%%EOF
