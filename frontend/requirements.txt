@@ -1,0 +1,2 @@
+flet>=1.0,<1.1          # la app usa la API de Flet 1.0
+httpx>=0.27
