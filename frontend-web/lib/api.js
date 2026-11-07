@@ -2,47 +2,29 @@
    Cliente de la API del repositorio. Todas las rutas van a /api/... y
    next.config.mjs las reenvía al backend FastAPI.
 
-   MODO DEMOSTRACIÓN (NEXT_PUBLIC_MODO_DEMO=1, p. ej. en Vercel): no hay
-   backend; el login usa una cuenta fija y los documentos/PDFs salen de
-   lib/demo-documentos.json y public/demo/ (generados con
-   `python ../database/cargar_demo.py --exportar-web`).
+   MODO DEMOSTRACIÓN (Vercel o NEXT_PUBLIC_MODO_DEMO=1): no hay backend;
+   cada función delega en lib/demo-api.js, que simula la API en el navegador.
    ========================================================================== */
-import documentosDemo from "./demo-documentos.json";
+import * as demo from "./demo-api";
+import { ErrorApi } from "./errores";
+
+export { ErrorApi };
+export const MODO_DEMO = process.env.NEXT_PUBLIC_MODO_DEMO === "1";
+export const { CUENTAS_DEMO, CLAVE_DEMO, reiniciarDemo } = demo;
 
 const CLAVE_TOKEN = "token";
 
-export const MODO_DEMO = process.env.NEXT_PUBLIC_MODO_DEMO === "1";
-
-/* Cuenta única del modo demostración (se muestra en la pantalla de login) */
-export const CREDENCIALES_DEMO = { usuario: "tutor", clave: "unexpo2026" };
-const USUARIO_DEMO = {
-  id: 0,
-  username: "tutor",
-  nombres: "Tutor",
-  apellidos: "Evaluador",
-  email: "demo@repositorio.local",
-  rol: "evaluador",
-  estado: "activo",
-  permisos: ["documento.descargar", "documento.ver"],
-};
-
-/* Pequeña espera para que la demo se sienta como una red real */
-const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
-
-export class ErrorApi extends Error {
-  constructor(mensaje, estado) {
-    super(mensaje);
-    this.estado = estado; // código HTTP (0 = sin conexión)
-  }
-}
-
-/* ---------- Token de sesión (JWT) guardado en el navegador ---------- */
+/* ---------- Token de sesión guardado en el navegador ---------- */
 export function obtenerToken() {
   try {
     return localStorage.getItem(CLAVE_TOKEN);
   } catch {
     return null;
   }
+}
+
+function guardarToken(token) {
+  localStorage.setItem(CLAVE_TOKEN, token);
 }
 
 export function cerrarSesionLocal() {
@@ -52,14 +34,15 @@ export function cerrarSesionLocal() {
 }
 
 /* ---------- Petición genérica con manejo de errores ---------- */
-async function pedir(ruta, opciones = {}) {
+async function pedir(ruta, { metodo = "GET", cuerpo } = {}) {
   const token = obtenerToken();
   let respuesta;
   try {
     respuesta = await fetch(`/api${ruta}`, {
-      ...opciones,
+      method: metodo,
+      body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
       headers: {
-        ...(opciones.body ? { "Content-Type": "application/json" } : {}),
+        ...(cuerpo === undefined ? {} : { "Content-Type": "application/json" }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
@@ -84,43 +67,62 @@ async function pedir(ruta, opciones = {}) {
   return respuesta;
 }
 
+const json = async (ruta, opciones) => (await pedir(ruta, opciones)).json();
+
 /* ---------- Autenticación ---------- */
 export async function iniciarSesion(username, password) {
-  if (MODO_DEMO) {
-    await esperar(400);
-    if (username.toLowerCase() !== CREDENCIALES_DEMO.usuario || password !== CREDENCIALES_DEMO.clave) {
-      throw new ErrorApi("Usuario o contraseña incorrectos", 401);
-    }
-    localStorage.setItem(CLAVE_TOKEN, "demo");
-    return USUARIO_DEMO;
-  }
-  const r = await pedir("/auth/login", { method: "POST", body: JSON.stringify({ username, password }) });
-  const datos = await r.json();
-  localStorage.setItem(CLAVE_TOKEN, datos.access_token);
+  const datos = MODO_DEMO
+    ? await demo.iniciarSesion(username, password)
+    : await json("/auth/login", { metodo: "POST", cuerpo: { username, password } });
+  guardarToken(datos.access_token);
   return datos.usuario;
 }
 
-export async function obtenerUsuario() {
-  if (MODO_DEMO) return USUARIO_DEMO;
-  return (await pedir("/auth/yo")).json();
+export const obtenerUsuario = () => (MODO_DEMO ? demo.obtenerUsuario(obtenerToken()) : json("/auth/yo"));
+
+/* ---------- Tesis ---------- */
+export const listarDocumentos = () => (MODO_DEMO ? demo.listarDocumentos(obtenerToken()) : json("/documentos"));
+
+/** PDF como Blob. modo "ver" = leer en línea; "descargar" = archivo (queda auditado) */
+export async function obtenerPdf(id, modo = "descargar") {
+  if (MODO_DEMO) return demo.obtenerPdf(obtenerToken(), id, modo);
+  return (await pedir(`/documentos/${id}/${modo}`)).blob();
 }
 
-/* ---------- Documentos ---------- */
-export async function listarDocumentos() {
-  if (MODO_DEMO) {
-    await esperar(300);
-    return documentosDemo;
-  }
-  return (await pedir("/documentos")).json();
-}
+export const editarDocumento = (id, cambios) =>
+  MODO_DEMO ? demo.editarDocumento(obtenerToken(), id, cambios) : json(`/documentos/${id}`, { metodo: "PATCH", cuerpo: cambios });
 
-/** Descarga el PDF (con el token) y lo devuelve como Blob */
-export async function obtenerPdf(id) {
-  if (MODO_DEMO) {
-    const doc = documentosDemo.find((d) => d.id === id);
-    const r = doc && (await fetch(`/demo/${doc.nombre_archivo}`).catch(() => null));
-    if (!r?.ok) throw new ErrorApi("No se encontró el PDF de demostración.", 404);
-    return r.blob();
-  }
-  return (await pedir(`/documentos/${id}/descargar`)).blob();
-}
+export const eliminarDocumento = (id) =>
+  MODO_DEMO ? demo.eliminarDocumento(obtenerToken(), id) : json(`/documentos/${id}`, { metodo: "DELETE" });
+
+/* ---------- Solicitudes de acceso ---------- */
+export const crearSolicitud = (documentoId, motivo) =>
+  MODO_DEMO
+    ? demo.crearSolicitud(obtenerToken(), documentoId, motivo)
+    : json("/solicitudes", { metodo: "POST", cuerpo: { documento_id: documentoId, motivo } });
+
+export const misSolicitudes = () => (MODO_DEMO ? demo.misSolicitudes(obtenerToken()) : json("/solicitudes/mias"));
+
+export const listarSolicitudes = () => (MODO_DEMO ? demo.listarSolicitudes(obtenerToken()) : json("/solicitudes"));
+
+/** accion: "aprobar" | "rechazar" | "revocar" */
+export const resolverSolicitud = (id, accion, nota) =>
+  MODO_DEMO
+    ? demo.resolverSolicitud(obtenerToken(), id, accion, nota)
+    : json(`/solicitudes/${id}/${accion}`, { metodo: "POST", cuerpo: { nota: nota || null } });
+
+/* ---------- Usuarios (administrador) ---------- */
+export const listarUsuarios = () => (MODO_DEMO ? demo.listarUsuarios(obtenerToken()) : json("/usuarios"));
+
+/** accion: "bloquear" | "desbloquear" */
+export const cambiarEstadoUsuario = (id, accion) =>
+  MODO_DEMO ? demo.cambiarEstadoUsuario(obtenerToken(), id, accion) : json(`/usuarios/${id}/${accion}`, { metodo: "POST" });
+
+export const aprobarUsuario = (id, rol) =>
+  MODO_DEMO ? demo.aprobarUsuario(obtenerToken(), id, rol) : json(`/usuarios/${id}/aprobar`, { metodo: "POST", cuerpo: { rol } });
+
+export const cambiarRolUsuario = (id, rol) =>
+  MODO_DEMO ? demo.cambiarRolUsuario(obtenerToken(), id, rol) : json(`/usuarios/${id}/rol`, { metodo: "PATCH", cuerpo: { rol } });
+
+export const eliminarUsuario = (id) =>
+  MODO_DEMO ? demo.eliminarUsuario(obtenerToken(), id) : json(`/usuarios/${id}`, { metodo: "DELETE" });

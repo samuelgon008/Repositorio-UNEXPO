@@ -71,7 +71,7 @@ cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 python ../database/init_db.py --crear-admin
-python ../database/cargar_demo.py      # 8 trabajos con PDFs de prueba
+python ../database/cargar_demo.py --usuarios-prueba   # 8 tesis de prueba + un docente y un estudiante
 uvicorn app.main:app --reload
 ```
 
@@ -92,6 +92,30 @@ Pruebas automáticas:
 ```bash
 cd backend && pytest -q
 ```
+
+## Roles
+
+| | Ver fichas y resumen | Leer el PDF en línea | Descargar | Administrar |
+|---|:-:|:-:|:-:|---|
+| **Administrador** | ✔ | ✔ | ✔ | Usuarios (aprobar, bloquear, cambiar rol, eliminar), solicitudes y tesis (ocultar, editar, eliminar) |
+| **Docente** | ✔ | ✔ | — | — |
+| **Estudiante** | ✔ | con solicitud aprobada | con solicitud aprobada | Sólo solicita acceso |
+
+**Solicitud de acceso:** el estudiante pide acceso a una tesis concreta (con un motivo opcional);
+el administrador la aprueba —habilita leer y descargar **esa** tesis durante 30 días—, la rechaza
+con una nota, o revoca un acceso vigente. Los roles y permisos se definen en
+`backend/app/core/catalogos.py` y el servidor los sincroniza con la base de datos al arrancar
+(una base de datos de la versión anterior se actualiza sola).
+
+### Probar los roles en su computadora
+`cargar_demo.py --usuarios-prueba` crea dos cuentas de prueba (contraseña `Prueba2026`):
+`docente.prueba` y `estudiante.prueba`. El administrador es el suyo (`init_db.py --crear-admin`).
+
+1. Entre como **estudiante.prueba** → pulse «Solicitar acceso» en una tesis.
+2. Entre como **administrador** → *Solicitudes* → «Aprobar 30 días».
+3. Vuelva como estudiante → esa tesis ya muestra «Leer tesis» y «PDF».
+4. Entre como **docente.prueba** → puede leer cualquier tesis, pero no descargar.
+5. Como administrador, en *Usuarios*, bloquee a alguien: no podrá volver a entrar.
 
 ## Flujo de autenticación
 

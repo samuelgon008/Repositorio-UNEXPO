@@ -19,7 +19,8 @@ PERMISOS = {
 
 # nombre: (nivel, descripción, permisos). El orden define los id en una BD nueva.
 ROLES = {
-    "administrador": (1, "Control total del repositorio", list(PERMISOS)),
+    # El administrador tiene todo salvo solicitar acceso (ya lee y descarga sin pedirlo)
+    "administrador": (1, "Control total del repositorio", [p for p in PERMISOS if p != "solicitud.crear"]),
     "docente": (2, "Consulta las fichas y lee las tesis en línea", ["documento.ver", "documento.leer"]),
     "estudiante": (3, "Consulta las fichas y solicita acceso a los PDF", ["documento.ver", "solicitud.crear"]),
 }

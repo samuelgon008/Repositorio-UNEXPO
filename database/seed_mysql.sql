@@ -24,7 +24,7 @@ INSERT INTO permisos (id, codigo, descripcion) VALUES
  (9, 'auditoria.ver',        'Consultar registros de acceso y descargas');
 
 INSERT INTO rol_permiso (rol_id, permiso_id) VALUES
- (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),
+ (1,1),(1,2),(1,3),(1,4),(1,5),(1,7),(1,8),(1,9),
  (2,1),(2,2),
  (3,1),(3,6);
 
