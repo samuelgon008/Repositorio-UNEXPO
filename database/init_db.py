@@ -4,8 +4,10 @@
     python database/init_db.py --crear-admin   # además pide datos del administrador
     python database/init_db.py --restablecer-password USUARIO   # olvidó la contraseña
 
-En MySQL también puede ejecutar schema_mysql.sql y seed_mysql.sql a mano;
-este script es idempotente y no duplica datos.
+Crea las tablas que falten y sincroniza roles, permisos y catálogos con
+backend/app/core/catalogos.py (lo mismo hace el servidor al arrancar).
+En MySQL también puede ejecutar schema_mysql.sql y seed_mysql.sql a mano.
+Este script es idempotente y no duplica datos.
 """
 import argparse
 import getpass
@@ -17,34 +19,19 @@ DIR_DB = Path(__file__).resolve().parent
 sys.path.insert(0, str(DIR_DB.parent / "backend"))
 
 from pydantic import ValidationError  # noqa: E402
-from sqlalchemy import func, or_, select, text  # noqa: E402
+from sqlalchemy import or_, select  # noqa: E402
 
 from app.config import settings  # noqa: E402
 from app.core.security import hashear_password  # noqa: E402
-from app.database import Base, SessionLocal, engine  # noqa: E402
+from app.database import SessionLocal  # noqa: E402
 from app.models import EstadoUsuario, Rol, Usuario  # noqa: E402
 from app.schemas.auth import RegistroIn  # noqa: E402
-
-
-def sentencias_seed() -> list[str]:
-    """Lee seed_mysql.sql (fuente única de los catálogos) quitando comentarios y USE."""
-    lineas = [
-        l for l in (DIR_DB / "seed_mysql.sql").read_text(encoding="utf-8").splitlines()
-        if l.strip() and not l.lstrip().startswith("--") and not l.upper().startswith("USE ")
-    ]
-    return [s.strip() for s in "\n".join(lineas).split(";") if s.strip()]
+from app.services.catalogos import preparar_base_de_datos  # noqa: E402
 
 
 def crear_esquema_y_catalogos() -> None:
-    Base.metadata.create_all(engine)
-    with SessionLocal() as db:
-        if db.scalar(select(func.count()).select_from(Rol)):
-            print("· Catálogos ya cargados, se omiten.")
-            return
-        for sentencia in sentencias_seed():
-            db.execute(text(sentencia))
-        db.commit()
-        print("✓ Roles, permisos, tipos de documento y etiquetas cargados.")
+    preparar_base_de_datos()
+    print("✓ Tablas, roles (administrador, docente, estudiante), permisos y catálogos al día.")
 
 
 def crear_admin() -> None:

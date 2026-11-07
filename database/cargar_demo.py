@@ -11,6 +11,11 @@ si se ejecuta dos veces no duplica nada.
 Exporta los MISMOS trabajos al modo demostración de la interfaz web (sin
 base de datos): PDFs en frontend-web/public/demo/ y la lista en
 frontend-web/lib/demo-documentos.json. Úselo al cambiar los datos de prueba.
+
+    python ../database/cargar_demo.py --usuarios-prueba
+
+Además crea una cuenta de prueba por rol (docente y estudiante; el
+administrador es el suyo) para probar los permisos. Contraseña: Prueba2026.
 """
 import hashlib
 import json
@@ -26,10 +31,11 @@ sys.path.insert(0, str(DIR_DB.parent / "backend"))
 from sqlalchemy import select  # noqa: E402
 
 from app.config import settings  # noqa: E402
+from app.core.security import hashear_password  # noqa: E402
 from app.database import SessionLocal  # noqa: E402
 from app.models import (  # noqa: E402
-    Documento, DocumentoPersona, Etiqueta, PalabraClave, Participacion, Persona, Rol,
-    TipoDocumento, Usuario,
+    Documento, DocumentoPersona, Etiqueta, EstadoUsuario, PalabraClave, Participacion, Persona,
+    Rol, TipoDocumento, Usuario,
 )
 
 # ----------------------------------------------------------------------------
@@ -195,6 +201,33 @@ def _palabra(db, termino) -> PalabraClave:
     return p
 
 
+# Cuentas para probar los roles (sólo para desarrollo, nunca en producción)
+USUARIOS_PRUEBA = [
+    # username,         rol,         nombres,     apellidos,  cédula
+    ("docente.prueba",    "docente",    "Laura",     "Contreras", "V-90000001"),
+    ("estudiante.prueba", "estudiante", "José",      "Salazar",   "V-90000002"),
+]
+CLAVE_PRUEBA = "Prueba2026"
+
+
+def crear_usuarios_prueba() -> list[str]:
+    """Crea (si no existen) las cuentas de prueba activas. Devuelve las creadas."""
+    creados = []
+    with SessionLocal() as db:
+        roles = {r.nombre: r for r in db.scalars(select(Rol))}
+        for username, rol, nombres, apellidos, cedula in USUARIOS_PRUEBA:
+            if db.scalar(select(Usuario.id).where(Usuario.username == username)):
+                continue
+            db.add(Usuario(
+                username=username, nombres=nombres, apellidos=apellidos, cedula=cedula,
+                email=f"{username}@prueba.local", password_hash=hashear_password(CLAVE_PRUEBA),
+                rol_id=roles[rol].id, estado=EstadoUsuario.activo,
+            ))
+            creados.append(username)
+        db.commit()
+    return creados
+
+
 def nombre_archivo(t: dict) -> str:
     """Nombre de descarga sin acentos, p. ej. "TEG_2026_Mendez.pdf"."""
     apellido = unicodedata.normalize("NFKD", t["autores"][0][1]).encode("ascii", "ignore").decode()
@@ -268,6 +301,13 @@ if __name__ == "__main__":
     if "--exportar-web" in sys.argv:
         print(f"✓ Modo demostración exportado: {exportar_web()}")
         sys.exit()
+    from app.services.catalogos import preparar_base_de_datos
+    preparar_base_de_datos()  # por si la BD es de una versión anterior
     n = cargar()
     print(f"✓ {n} documentos de prueba cargados." if n else "· Los documentos de prueba ya estaban cargados.")
     print(f"  PDFs en: {settings.storage_dir}")
+    if "--usuarios-prueba" in sys.argv:
+        crear_usuarios_prueba()
+        print(f"✓ Cuentas de prueba (contraseña {CLAVE_PRUEBA}):")
+        for username, rol, *_ in USUARIOS_PRUEBA:
+            print(f"   - {username:<18} rol {rol}")

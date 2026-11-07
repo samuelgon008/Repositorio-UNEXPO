@@ -6,11 +6,11 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.core.catalogos import ROL_POR_DEFECTO
 from app.core.security import ahora_utc, hashear_password, verificar_password
 from app.models import EstadoUsuario, RegistroAcceso, Rol, Usuario
 from app.schemas.auth import RegistroIn, UsuarioOut
 
-ROL_POR_DEFECTO = "estudiante"
 MSG_CREDENCIALES = "Usuario o contraseña incorrectos"
 
 

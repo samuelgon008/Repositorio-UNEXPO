@@ -13,14 +13,14 @@ USE repositorio_unexpo;
 -- ---------------------------------------------------------------------
 CREATE TABLE roles (
     id          TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre      VARCHAR(30)  NOT NULL UNIQUE,      -- administrador, bibliotecario, estudiante, invitado
+    nombre      VARCHAR(30)  NOT NULL UNIQUE,      -- administrador, docente, estudiante
     descripcion VARCHAR(255),
     nivel       TINYINT UNSIGNED NOT NULL          -- 1 = mayor privilegio
 ) ENGINE=InnoDB;
 
 CREATE TABLE permisos (
     id          SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    codigo      VARCHAR(50)  NOT NULL UNIQUE,      -- p.ej. 'documento.descargar'
+    codigo      VARCHAR(50)  NOT NULL UNIQUE,      -- p.ej. 'documento.leer'
     descripcion VARCHAR(255)
 ) ENGINE=InnoDB;
 
@@ -136,7 +136,28 @@ CREATE TABLE documento_palabra_clave (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- 4. AUDITORÍA
+-- 4. SOLICITUDES DE ACCESO (estudiantes piden leer/descargar una tesis)
+-- ---------------------------------------------------------------------
+CREATE TABLE solicitudes_acceso (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    usuario_id   INT UNSIGNED NOT NULL,
+    documento_id INT UNSIGNED NOT NULL,
+    motivo       VARCHAR(500) NULL,
+    estado       ENUM('pendiente','aprobada','rechazada','revocada') NOT NULL DEFAULT 'pendiente',
+    nota_admin   VARCHAR(300) NULL,                    -- respuesta del administrador
+    creada_en    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resuelta_en  DATETIME NULL,
+    resuelta_por INT UNSIGNED NULL,
+    vence_en     DATETIME NULL,                        -- fin del acceso aprobado (30 días)
+    FOREIGN KEY (usuario_id)   REFERENCES usuarios(id)   ON DELETE CASCADE,
+    FOREIGN KEY (documento_id) REFERENCES documentos(id) ON DELETE CASCADE,
+    FOREIGN KEY (resuelta_por) REFERENCES usuarios(id)   ON DELETE SET NULL,
+    INDEX idx_solicitud_usuario (usuario_id, documento_id),
+    INDEX idx_solicitud_estado (estado)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 5. AUDITORÍA
 -- ---------------------------------------------------------------------
 CREATE TABLE registro_accesos (
     id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
