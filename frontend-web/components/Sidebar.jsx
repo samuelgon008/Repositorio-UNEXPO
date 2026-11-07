@@ -1,21 +1,34 @@
 "use client";
 
 import {
-  Bell, FolderOpen, GraduationCap, LayoutDashboard, LogOut, Moon, PanelLeftClose,
-  PanelLeftOpen, Star, Sun, X,
+  Bell, FolderOpen, GraduationCap, Inbox, LayoutDashboard, LogOut, Moon, PanelLeftClose,
+  PanelLeftOpen, Send, Star, Sun, Users, X,
 } from "lucide-react";
 
-/* Opciones de navegación principal. `id` coincide con la vista que muestra
-   page.jsx. (La búsqueda vive en la barra superior, no en el menú.) */
-const OPCIONES = [
-  { id: "principal", etiqueta: "Principal", Icono: LayoutDashboard },
-  { id: "categorias", etiqueta: "Explorar Categorías", Icono: FolderOpen },
-  { id: "favoritos", etiqueta: "Mis Favoritos", Icono: Star },
-  { id: "notificaciones", etiqueta: "Notificaciones", Icono: Bell },
-];
+import { cx, NOMBRE_ROL } from "@/components/ui";
 
-/* Une clases condicionales: cx("a", falso && "b", "c") → "a c" */
-const cx = (...clases) => clases.filter(Boolean).join(" ");
+/* Secciones del menú. `id` coincide con la vista que muestra page.jsx.
+   `permiso`: la opción sólo aparece si el rol del usuario lo tiene.
+   `contador`: clave del número rojo (ver prop `contadores`). */
+const SECCIONES = [
+  {
+    titulo: "Menú",
+    opciones: [
+      { id: "principal", etiqueta: "Principal", Icono: LayoutDashboard },
+      { id: "categorias", etiqueta: "Explorar Categorías", Icono: FolderOpen },
+      { id: "favoritos", etiqueta: "Mis Favoritos", Icono: Star },
+      { id: "mis-solicitudes", etiqueta: "Mis Solicitudes", Icono: Send, permiso: "solicitud.crear" },
+      { id: "notificaciones", etiqueta: "Notificaciones", Icono: Bell, contador: "notificaciones" },
+    ],
+  },
+  {
+    titulo: "Administración",
+    opciones: [
+      { id: "solicitudes", etiqueta: "Solicitudes", Icono: Inbox, permiso: "solicitud.gestionar", contador: "solicitudes" },
+      { id: "usuarios", etiqueta: "Usuarios", Icono: Users, permiso: "usuario.gestionar", contador: "usuarios" },
+    ],
+  },
+];
 
 /**
  * Texto de un elemento del menú. Al colapsar (sólo en escritorio) se
@@ -50,14 +63,6 @@ function Tooltip({ colapsado, children }) {
     </span>
   );
 }
-
-const NOMBRE_ROL = {
-  administrador: "Administrador",
-  bibliotecario: "Bibliotecario",
-  estudiante: "Estudiante",
-  invitado: "Invitado",
-  evaluador: "Evaluador (demo)", // cuenta del modo demostración
-};
 
 /**
  * Bloque de perfil: avatar con iniciales, nombre corto y rol.
@@ -110,8 +115,14 @@ export default function Sidebar({
   oscuro,
   onAlternarTema,
   onCerrarSesion,
-  pendientes = 0,   // notificaciones sin leer
+  contadores = {},  // { notificaciones, solicitudes, usuarios }: números rojos del menú
 }) {
+  // Opciones visibles para este usuario (las que no piden permiso, siempre)
+  const permisos = usuario?.permisos ?? [];
+  const secciones = SECCIONES
+    .map((s) => ({ ...s, opciones: s.opciones.filter((o) => !o.permiso || permisos.includes(o.permiso)) }))
+    .filter((s) => s.opciones.length > 0);
+
   return (
     <>
       {/* ---------- Fondo oscuro detrás del cajón (sólo móvil) ---------- */}
@@ -175,62 +186,67 @@ export default function Sidebar({
         {/* ---------- Navegación ---------- */}
         {/* Sin overflow-auto a propósito: recortaría los tooltips del menú colapsado */}
         <nav className="flex-1 space-y-1 px-3 py-5">
-          <p
-            className={cx(
-              "mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 transition-opacity duration-300",
-              colapsado && "md:opacity-0",
-            )}
-          >
-            Menú
-          </p>
-
-          {OPCIONES.map(({ id, etiqueta, Icono }) => {
-            const activa = vistaActiva === id;
-            return (
-              <button
-                key={id}
-                onClick={() => onNavegar(id)}
-                aria-current={activa ? "page" : undefined}
+          {secciones.map(({ titulo, opciones }, i) => (
+            <div key={titulo} className={cx("space-y-1", i > 0 && "pt-4")}>
+              <p
                 className={cx(
-                  "group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
-                  "transition-colors duration-200",
-                  activa
-                    ? "bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-primary-300",
+                  "mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 transition-opacity duration-300",
+                  colapsado && "md:opacity-0",
                 )}
               >
-                {/* Barra indicadora del elemento activo */}
-                <span
-                  className={cx(
-                    "absolute -left-3 h-6 w-1 rounded-r-full bg-primary-600 transition-opacity dark:bg-primary-400",
-                    activa ? "opacity-100" : "opacity-0",
-                  )}
-                />
-                <span className="relative shrink-0">
-                  <Icono size={20} />
-                  {/* Contador rojo sobre el icono cuando el menú está colapsado */}
-                  {id === "notificaciones" && pendientes > 0 && colapsado && (
-                    <span className="absolute -right-2 -top-2 hidden h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white md:grid dark:ring-slate-900">
-                      {pendientes > 9 ? "9+" : pendientes}
-                    </span>
-                  )}
-                </span>
-                <Etiqueta colapsado={colapsado}>{etiqueta}</Etiqueta>
-                {/* Contador de pendientes cuando el menú está expandido */}
-                {id === "notificaciones" && pendientes > 0 && (
-                  <span
+                {titulo}
+              </p>
+
+              {opciones.map(({ id, etiqueta, Icono, contador }) => {
+                const activa = vistaActiva === id;
+                const numero = contador ? contadores[contador] ?? 0 : 0;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => onNavegar(id)}
+                    aria-current={activa ? "page" : undefined}
                     className={cx(
-                      "ml-auto rounded-full bg-rose-500 px-2 py-0.5 text-[11px] font-semibold text-white transition-opacity duration-300",
-                      colapsado && "md:hidden",
+                      "group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
+                      "transition-colors duration-200",
+                      activa
+                        ? "bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-primary-300",
                     )}
                   >
-                    {pendientes}
-                  </span>
-                )}
-                <Tooltip colapsado={colapsado}>{etiqueta}</Tooltip>
-              </button>
-            );
-          })}
+                    {/* Barra indicadora del elemento activo */}
+                    <span
+                      className={cx(
+                        "absolute -left-3 h-6 w-1 rounded-r-full bg-primary-600 transition-opacity dark:bg-primary-400",
+                        activa ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    <span className="relative shrink-0">
+                      <Icono size={20} />
+                      {/* Contador rojo sobre el icono cuando el menú está colapsado */}
+                      {numero > 0 && colapsado && (
+                        <span className="absolute -right-2 -top-2 hidden h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white md:grid dark:ring-slate-900">
+                          {numero > 9 ? "9+" : numero}
+                        </span>
+                      )}
+                    </span>
+                    <Etiqueta colapsado={colapsado}>{etiqueta}</Etiqueta>
+                    {/* Contador cuando el menú está expandido */}
+                    {numero > 0 && (
+                      <span
+                        className={cx(
+                          "ml-auto rounded-full bg-rose-500 px-2 py-0.5 text-[11px] font-semibold text-white transition-opacity duration-300",
+                          colapsado && "md:hidden",
+                        )}
+                      >
+                        {numero}
+                      </span>
+                    )}
+                    <Tooltip colapsado={colapsado}>{etiqueta}</Tooltip>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* ---------- Parte inferior: tema y cerrar sesión ---------- */}

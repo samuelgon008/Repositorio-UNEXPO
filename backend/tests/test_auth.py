@@ -41,7 +41,7 @@ def test_registro_pendiente_y_aprobacion(client):
 
     r = _login(client, "ana.perez", "Clave2026")
     assert r.status_code == 200
-    assert r.json()["usuario"]["permisos"] == ["documento.descargar", "documento.ver"]
+    assert r.json()["usuario"]["permisos"] == ["documento.ver", "solicitud.crear"]
 
     # Un estudiante no puede gestionar usuarios
     cab_ana = {"Authorization": f"Bearer {r.json()['access_token']}"}

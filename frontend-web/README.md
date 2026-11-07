@@ -33,8 +33,12 @@ Si el backend está en otra máquina, indique su dirección con la variable `API
 
 ## Versión de demostración en Vercel (para tutores)
 Vercel no puede llegar al backend de la computadora local, así que allí la web
-corre en **modo demostración**: sin base de datos, con una cuenta fija
-(`tutor` / `unexpo2026`) y los PDFs de prueba de `public/demo/`.
+corre en **modo demostración**: sin base de datos, con los PDFs de prueba de
+`public/demo/` y tres cuentas, una por rol: `admin`, `docente` y `estudiante`
+(contraseña `unexpo2026`). `lib/demo-api.js` simula en el navegador las mismas reglas
+del backend, así que el flujo completo se puede probar: el estudiante solicita
+acceso, el administrador lo aprueba y el estudiante ya puede leer la tesis. Los
+cambios se guardan en el navegador; «Reiniciar datos de la demo» los borra.
 
 1. En vercel.com → **Add New… → Project** → importe el repositorio de GitHub.
 2. **Root Directory:** `frontend-web` (botón *Edit*). Vercel detecta Next.js solo.
@@ -58,11 +62,17 @@ frontend-web/
 ├── components/
 │   ├── Sidebar.jsx         menú colapsable + modo oscuro + perfil + cerrar sesión
 │   ├── BarraBusqueda.jsx   buscador superior (atajo de teclado: /)
-│   ├── TarjetaProyecto.jsx tarjeta de cada trabajo (ver, descargar, favorito)
+│   ├── TarjetaProyecto.jsx tarjeta de cada tesis (acciones según el rol y el acceso)
+│   ├── ModalSolicitud.jsx  estudiante: pedir acceso a una tesis
+│   ├── VistaMisSolicitudes.jsx  estudiante: estado de sus solicitudes
+│   ├── VistaSolicitudes.jsx     administrador: aprobar / rechazar / revocar
+│   ├── VistaUsuarios.jsx        administrador: aprobar, bloquear, rol, eliminar
 │   ├── VistaCategorias.jsx áreas temáticas para explorar
-│   └── ListaNotificaciones.jsx
+│   ├── ListaNotificaciones.jsx
+│   └── ui.jsx              piezas compartidas (etiquetas, modal, botones…)
 ├── lib/
 │   ├── api.js              llamadas a la API y token de sesión
+│   ├── demo-api.js         API simulada del modo demostración
 │   ├── datos-prueba.js     notificaciones de ejemplo (aún sin backend)
 │   ├── demo-documentos.json trabajos del modo demostración (Vercel)
 │   └── useTema.js          lógica del modo claro/oscuro

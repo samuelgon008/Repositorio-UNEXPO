@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, FlaskConical, GraduationCap, LoaderCircle, LockKeyhole, UserRound } from "lucide-react";
 
-import { CREDENCIALES_DEMO, MODO_DEMO, iniciarSesion } from "@/lib/api";
+import { CLAVE_DEMO, CUENTAS_DEMO, MODO_DEMO, iniciarSesion, reiniciarDemo } from "@/lib/api";
 
 /* Campo de texto con icono a la izquierda */
 function Campo({ Icono, children }) {
@@ -63,29 +63,51 @@ export default function Login() {
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Ingeniería Electrónica · UNEXPO</p>
         </div>
 
-        {/* Aviso del modo demostración con la cuenta de prueba */}
+        {/* Modo demostración: una cuenta por rol para probar los permisos */}
         {MODO_DEMO && (
-          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-primary-200 bg-primary-50 p-4 text-sm
+          <div className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-4 text-sm
                           dark:border-primary-500/30 dark:bg-primary-500/10">
-            <FlaskConical size={20} className="mt-0.5 shrink-0 text-primary-600 dark:text-primary-300" />
-            <div className="min-w-0 flex-1 text-slate-700 dark:text-slate-200">
-              <p className="font-semibold">Versión de demostración</p>
-              <p className="mt-0.5 text-slate-600 dark:text-slate-300">
-                Usuario <code className="font-semibold">{CREDENCIALES_DEMO.usuario}</code> · contraseña{" "}
-                <code className="font-semibold">{CREDENCIALES_DEMO.clave}</code>
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsuario(CREDENCIALES_DEMO.usuario);
-                  setClave(CREDENCIALES_DEMO.clave);
-                  setError("");
-                }}
-                className="mt-2 font-semibold text-primary-700 hover:underline dark:text-primary-300"
-              >
-                Rellenar automáticamente
-              </button>
+            <div className="flex items-start gap-3">
+              <FlaskConical size={20} className="mt-0.5 shrink-0 text-primary-600 dark:text-primary-300" />
+              <div className="min-w-0 flex-1 text-slate-700 dark:text-slate-200">
+                <p className="font-semibold">Versión de demostración</p>
+                <p className="mt-0.5 text-slate-600 dark:text-slate-300">
+                  Elija un rol para probarlo (contraseña <code className="font-semibold">{CLAVE_DEMO}</code>):
+                </p>
+              </div>
             </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {CUENTAS_DEMO.map(({ usuario: u, rol }) => (
+                <button
+                  key={u}
+                  type="button"
+                  onClick={() => {
+                    setUsuario(u);
+                    setClave(CLAVE_DEMO);
+                    setError("");
+                  }}
+                  className={`rounded-lg border px-2 py-1.5 text-xs font-semibold transition-colors ${
+                    usuario === u
+                      ? "border-primary-500 bg-primary-600 text-white"
+                      : "border-primary-200 bg-white text-primary-700 hover:bg-primary-100 dark:border-primary-500/30 dark:bg-slate-900 dark:text-primary-300"
+                  }`}
+                >
+                  {rol}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm("¿Volver la demo a su estado inicial? Se borran las solicitudes y cambios de prueba.")) {
+                  reiniciarDemo();
+                  setError("");
+                }
+              }}
+              className="mt-3 text-xs text-slate-500 hover:text-slate-700 hover:underline dark:text-slate-400"
+            >
+              Reiniciar datos de la demo
+            </button>
           </div>
         )}
 

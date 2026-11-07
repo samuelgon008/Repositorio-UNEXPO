@@ -24,6 +24,8 @@ erDiagram
     USUARIOS ||--o{ REGISTRO_ACCESOS : "intenta ingresar"
     USUARIOS ||--o{ DESCARGAS : "descarga"
     DOCUMENTOS ||--o{ DESCARGAS : "es descargado"
+    USUARIOS ||--o{ SOLICITUDES_ACCESO : "solicita"
+    DOCUMENTOS ||--o{ SOLICITUDES_ACCESO : "es solicitado"
 
     ROLES {
         tinyint id PK
@@ -96,6 +98,15 @@ erDiagram
         int documento_id FK
         datetime fecha
     }
+    SOLICITUDES_ACCESO {
+        int id PK
+        int usuario_id FK
+        int documento_id FK
+        varchar motivo
+        enum estado "pendiente|aprobada|rechazada|revocada"
+        int resuelta_por FK
+        datetime vence_en "aprobada + 30 días"
+    }
 ```
 
 ## Tablas explicadas
@@ -104,22 +115,30 @@ erDiagram
 
 | Tabla | Propósito | Claves y reglas |
 |---|---|---|
-| `roles` | Los 4 perfiles del sistema. `nivel` ordena el privilegio (1 = máximo). | `nombre` único |
+| `roles` | Los 3 perfiles del sistema: administrador, docente y estudiante. `nivel` ordena el privilegio (1 = máximo). | `nombre` único |
 | `permisos` | Acciones atómicas, p. ej. `documento.descargar`. El código pregunta por **permisos**, nunca por nombres de rol, así que crear un rol nuevo no exige tocar código. | `codigo` único |
 | `rol_permiso` | Relación N:M entre roles y permisos. | PK compuesta |
 | `usuarios` | Cuentas. La contraseña se guarda sólo como hash **bcrypt**. `estado` implementa el flujo *registro → pendiente → aprobado por admin*. `intentos_fallidos` y `bloqueado_hasta` frenan ataques de fuerza bruta. | `cedula`, `email`, `username` únicos; `aprobado_por` → `usuarios.id` |
 
-**Matriz de permisos inicial**
+**Matriz de permisos** (fuente única: `backend/app/core/catalogos.py`)
 
-| Permiso | Administrador | Bibliotecario | Estudiante | Invitado |
-|---|:-:|:-:|:-:|:-:|
-| `documento.ver` (buscar, ver ficha y resumen) | ✔ | ✔ | ✔ | ✔ |
-| `documento.descargar` | ✔ | ✔ | ✔ | |
-| `documento.subir` | ✔ | ✔ | | |
-| `documento.editar` (metadatos, publicar) | ✔ | ✔ | | |
-| `documento.eliminar` | ✔ | | | |
-| `usuario.gestionar` | ✔ | | | |
-| `auditoria.ver` | ✔ | | | |
+| Permiso | Administrador | Docente | Estudiante |
+|---|:-:|:-:|:-:|
+| `documento.ver` (buscar, ver ficha y resumen) | ✔ | ✔ | ✔ |
+| `documento.leer` (abrir el PDF en línea) | ✔ | ✔ | sólo con solicitud aprobada |
+| `documento.descargar` | ✔ | | sólo con solicitud aprobada |
+| `documento.editar` (corregir, ocultar o publicar) | ✔ | | |
+| `documento.eliminar` | ✔ | | |
+| `solicitud.crear` (pedir acceso a una tesis) | | | ✔ |
+| `solicitud.gestionar` (aprobar, rechazar, revocar) | ✔ | | |
+| `usuario.gestionar` (aprobar, bloquear, cambiar rol, eliminar) | ✔ | | |
+| `auditoria.ver` | ✔ | | |
+
+### Bloque de solicitudes de acceso
+
+| Tabla | Propósito |
+|---|---|
+| `solicitudes_acceso` | Un estudiante pide acceso a **una tesis concreta**, con un motivo opcional. El administrador la aprueba (habilita leer y descargar esa tesis hasta `vence_en`, 30 días), la rechaza con una nota, o revoca un acceso vigente. Una solicitud aprobada cuyo plazo pasó se muestra como *vencida*, y el estudiante puede volver a pedirla. |
 
 ### Bloque documental
 
@@ -139,7 +158,7 @@ erDiagram
 | `documento_etiqueta`, `documento_palabra_clave` | Puentes N:M. |
 
 > **Etiqueta vs. palabra clave:** la etiqueta responde *"¿a qué área pertenece?"* (la elige el
-> bibliotecario de una lista cerrada); la palabra clave responde *"¿de qué trata exactamente?"*
+> administrador de una lista cerrada); la palabra clave responde *"¿de qué trata exactamente?"*
 > (la escribe el autor).
 
 ### Bloque de auditoría

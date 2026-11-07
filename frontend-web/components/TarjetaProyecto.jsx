@@ -1,15 +1,11 @@
-import { ArrowUpRight, CalendarDays, FileDown, LoaderCircle, Star, UserRound } from "lucide-react";
+import {
+  BookOpen, CalendarDays, Clock, Eye, EyeOff, FileDown, KeyRound, LoaderCircle, Star, Trash2, UserRound,
+} from "lucide-react";
 
-/* Color del distintivo según el tipo de documento */
-const ESTILO_TIPO = {
-  TEG: "bg-primary-50 text-primary-700 ring-primary-600/15 dark:bg-primary-500/15 dark:text-primary-300 dark:ring-primary-400/20",
-  IEI: "bg-amber-50 text-amber-700 ring-amber-600/15 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-400/20",
-};
+import { Chip, formatoFecha } from "@/components/ui";
 
 const NOMBRE_TIPO = { TEG: "Trabajo de Grado", IEI: "Entrenamiento Industrial" };
-
-/* Formato de fecha corto en español: "15 oct 2026" */
-const formatoFecha = new Intl.DateTimeFormat("es-VE", { day: "numeric", month: "short", year: "numeric" });
+const TONO_TIPO = { TEG: "violeta", IEI: "ambar" };
 
 /** Distintivo (badge) neutro */
 function Badge({ children }) {
@@ -20,37 +16,76 @@ function Badge({ children }) {
   );
 }
 
+/** Botón de icono pequeño del pie de la tarjeta */
+function BotonIcono({ etiqueta, className = "", children, ...props }) {
+  return (
+    <button
+      {...props}
+      aria-label={etiqueta}
+      title={etiqueta}
+      className={`rounded-lg p-1.5 transition-colors disabled:cursor-wait ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/** Línea informativa sobre la solicitud del estudiante (aprobada, rechazada…) */
+function EstadoAcceso({ solicitud, puedeLeer }) {
+  if (!solicitud) return null;
+  const { estado, vence_en, nota_admin } = solicitud;
+  if (estado === "aprobada" && puedeLeer) {
+    return <p className="mt-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">Acceso aprobado hasta el {formatoFecha(vence_en)}</p>;
+  }
+  const textos = { rechazada: "Solicitud rechazada", revocada: "Acceso revocado", vencida: "Su acceso venció" };
+  if (!textos[estado]) return null;
+  return (
+    <p className={`mt-3 text-xs ${estado === "rechazada" ? "text-rose-600 dark:text-rose-400" : "text-slate-500 dark:text-slate-400"}`}>
+      {textos[estado]}
+      {nota_admin && <span className="text-slate-500 dark:text-slate-400"> · «{nota_admin}»</span>}
+    </p>
+  );
+}
+
 /**
- * Tarjeta de un trabajo del repositorio.
- * `proyecto`: documento de GET /documentos ya adaptado en page.jsx.
- * `favorito` / `onAlternarFavorito`: estrella de "Mis Favoritos".
- * `onVer` abre el PDF en otra pestaña; `onDescargar` lo descarga.
- * `puedeDescargar`: el rol tiene el permiso documento.descargar.
+ * Tarjeta de una tesis. Lo que muestra depende de lo que el usuario puede
+ * hacer con ELLA (calculado por el backend en puede_leer / puede_descargar):
+ *   - Leer / PDF            si tiene acceso
+ *   - Solicitar acceso      estudiante sin acceso (o "Solicitud pendiente")
+ *   - Ocultar / Eliminar    administrador
  */
 export default function TarjetaProyecto({
-  proyecto, favorito = false, onAlternarFavorito, onVer, onDescargar, puedeDescargar = true, descargando = false,
+  proyecto, favorito = false, onAlternarFavorito,
+  onLeer, onDescargar, onSolicitar, onAlternarPublicado, onEliminar,
+  puedeSolicitar = false, puedeAdministrar = false, cargando = null,
 }) {
-  const { titulo, autores, tipo, anio, carrera, area, resumen, fecha } = proyecto;
+  const {
+    titulo, autores, tipo, anio, carrera, area, resumen, fecha,
+    publicado, puede_leer, puede_descargar, solicitud,
+  } = proyecto;
+  const pendiente = solicitud?.estado === "pendiente";
 
   return (
+    /* Profundidad: sombra media en modo claro; al pasar el cursor la tarjeta
+       sube 4 px y la sombra se agranda y difumina (efecto "flotar").
+       En modo oscuro no hay sombra en reposo (dark:shadow-none). */
     <article
-      /* Profundidad: sombra media en modo claro; al pasar el cursor la tarjeta
-         sube 4 px y la sombra se agranda y difumina (efecto "flotar").
-         En modo oscuro no hay sombra en reposo (dark:shadow-none). */
-      className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-md
-                 transition duration-300 ease-suave
-                 hover:-translate-y-1 hover:border-primary-300 hover:shadow-xl
-                 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none
-                 dark:hover:border-primary-500/40 dark:hover:shadow-xl dark:hover:shadow-black/30"
+      className={`group flex flex-col rounded-2xl border bg-white p-5 shadow-md
+                  transition duration-300 ease-suave hover:-translate-y-1 hover:shadow-xl
+                  dark:bg-slate-900 dark:shadow-none dark:hover:shadow-xl dark:hover:shadow-black/30
+                  ${publicado
+                    ? "border-slate-200 hover:border-primary-300 dark:border-slate-800 dark:hover:border-primary-500/40"
+                    : "border-dashed border-slate-300 opacity-80 dark:border-slate-700"}`}
     >
-      {/* Tipo de documento y fecha de publicación */}
+      {/* Tipo de documento, estado y fecha */}
       <div className="mb-3 flex items-center justify-between gap-2">
-        <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${ESTILO_TIPO[tipo]}`}>
-          {NOMBRE_TIPO[tipo]}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <Chip tono={TONO_TIPO[tipo]}>{NOMBRE_TIPO[tipo]}</Chip>
+          {!publicado && <Chip tono="gris" Icono={EyeOff}>Oculta</Chip>}
+        </div>
         <span className="flex shrink-0 items-center gap-1 text-xs text-slate-400">
           <CalendarDays size={13} />
-          <time dateTime={fecha}>{formatoFecha.format(new Date(`${fecha}T12:00:00`))}</time>
+          <time dateTime={fecha}>{formatoFecha(fecha)}</time>
         </span>
       </div>
 
@@ -65,7 +100,7 @@ export default function TarjetaProyecto({
         <span className="truncate">{autores.join(", ")}</span>
       </p>
 
-      {/* Resumen: máximo 3 líneas, el resto se trunca con "…" */}
+      {/* Resumen: la "descripción" que todos los roles pueden ver (máximo 3 líneas) */}
       <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{resumen}</p>
 
       {/* Etiquetas */}
@@ -75,46 +110,82 @@ export default function TarjetaProyecto({
         <Badge>{anio}</Badge>
       </div>
 
+      <EstadoAcceso solicitud={solicitud} puedeLeer={puede_leer} />
+
       {/* Acciones: mt-auto las alinea al fondo aunque las tarjetas tengan distinta altura */}
       <div className="mt-auto pt-5">
         <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
-          {/* Abre el PDF en una pestaña nueva (o la ficha, si el rol no puede descargar) */}
-          <button
-            onClick={onVer}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 transition-colors
-                       hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-          >
-            Ver detalles
-            <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </button>
-
-          <div className="flex items-center gap-1">
-            {/* Estrella de favorito: rellena y ámbar cuando está marcada */}
+          {/* Acción principal según el acceso */}
+          {puede_leer ? (
             <button
+              onClick={onLeer}
+              disabled={cargando === "ver"}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 transition-colors
+                         hover:text-primary-700 disabled:cursor-wait dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              {cargando === "ver" ? <LoaderCircle size={16} className="animate-spin" /> : <BookOpen size={16} />}
+              Leer tesis
+            </button>
+          ) : pendiente ? (
+            <Chip tono="ambar" Icono={Clock}>Solicitud pendiente</Chip>
+          ) : puedeSolicitar ? (
+            <button
+              onClick={onSolicitar}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-semibold
+                         text-primary-700 transition-colors hover:bg-primary-100
+                         dark:bg-primary-500/15 dark:text-primary-300 dark:hover:bg-primary-500/25"
+            >
+              <KeyRound size={15} />
+              {solicitud ? "Solicitar de nuevo" : "Solicitar acceso"}
+            </button>
+          ) : (
+            <span className="text-xs text-slate-400">Solo ficha</span>
+          )}
+
+          <div className="flex items-center gap-0.5">
+            {/* Estrella de favorito: rellena y ámbar cuando está marcada */}
+            <BotonIcono
+              etiqueta={favorito ? "Quitar de Mis Favoritos" : "Agregar a Mis Favoritos"}
               onClick={onAlternarFavorito}
               aria-pressed={favorito}
-              aria-label={favorito ? "Quitar de Mis Favoritos" : "Agregar a Mis Favoritos"}
-              title={favorito ? "Quitar de Mis Favoritos" : "Agregar a Mis Favoritos"}
-              className={`rounded-lg p-1.5 transition-colors ${
-                favorito
-                  ? "text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10"
-                  : "text-slate-400 hover:bg-slate-100 hover:text-amber-400 dark:text-slate-500 dark:hover:bg-slate-800"
-              }`}
+              className={favorito
+                ? "text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10"
+                : "text-slate-400 hover:bg-slate-100 hover:text-amber-400 dark:text-slate-500 dark:hover:bg-slate-800"}
             >
               <Star size={18} fill={favorito ? "currentColor" : "none"} />
-            </button>
+            </BotonIcono>
 
-            {/* Descarga: GET /documentos/{id}/descargar (sólo roles con permiso) */}
-            {puedeDescargar && (
+            {/* Herramientas del administrador */}
+            {puedeAdministrar && (
+              <>
+                <BotonIcono
+                  etiqueta={publicado ? "Ocultar tesis" : "Publicar tesis"}
+                  onClick={onAlternarPublicado}
+                  className="text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                >
+                  {publicado ? <EyeOff size={18} /> : <Eye size={18} />}
+                </BotonIcono>
+                <BotonIcono
+                  etiqueta={`Eliminar «${titulo}»`}
+                  onClick={onEliminar}
+                  className="text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                >
+                  <Trash2 size={18} />
+                </BotonIcono>
+              </>
+            )}
+
+            {/* Descarga: sólo si este usuario puede descargar esta tesis */}
+            {puede_descargar && (
               <button
                 onClick={onDescargar}
-                disabled={descargando}
+                disabled={cargando === "descargar"}
                 aria-label={`Descargar PDF de «${titulo}»`}
-                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-500
+                className="ml-0.5 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-500
                            transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:cursor-wait
                            dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               >
-                {descargando ? <LoaderCircle size={16} className="animate-spin" /> : <FileDown size={16} />}
+                {cargando === "descargar" ? <LoaderCircle size={16} className="animate-spin" /> : <FileDown size={16} />}
                 PDF
               </button>
             )}
